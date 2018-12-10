@@ -4,12 +4,14 @@
 # user id
 # true values for rating and pickiness, all i.i.d Unif(0, 5)
 # predicted values for rating and pickiness, init to 2.5
+import random
+
 class User:
 
-    def __init__(self, id, r, p):
+    def __init__(self, id):
         self.id = id
-        self.r = r
-        self.p = p
+        self.r = round(random.uniform(0.0, 5.0), 1)
+        self.p = round(random.uniform(0.0, 5.0), 1)
         self.r_hat = 2.5
         self.p_hat = 2.5
         self.seen = set()
