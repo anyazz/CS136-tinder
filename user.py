@@ -22,20 +22,13 @@ class User:
 # get_utility - calculates utility to user
 # update_predictions - based on outcome of swipe, update r_hat and p_hat
     def swipe(self, user):
-		diff = (self.p_hat - user.r_hat) * discount
+        diff = (self.p_hat - user.r_hat) * discount
         if self.p <= user.r:
-        	if self.p_hat > user.r_hat:
-            	self.p_hat -= diff
-            	user.r_hat += diff
+            if self.p_hat > user.r_hat:
+            	self.p_hat = max(self.p_hat - diff, 0)
+            	user.r_hat = min(user.r_hat + diff, 5)
         else:
             if self.p_hat <= user.r_hat:
-            	self.p_hat += diff
-            	user.r_hat -= diff
-        return
-
-    def swiped(self, direction, user):
-        if direction:
-            self.rating += userPick * discount
-        else:
-            self.rating -= userPick * discount
+            	self.p_hat = min(self.p_hat - diff, 5)
+            	user.r_hat = max(user.r_hat + diff, 0)
         return
