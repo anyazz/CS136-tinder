@@ -16,7 +16,7 @@ class User:
         self.p_hat = 2.5
         self.seen = set()
         self.matches = set()
-        self.discount = 0.3
+        self.discount = 0.7
         self.history = []
 
     def __str__(self):

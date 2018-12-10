@@ -6,6 +6,7 @@
 #    use predictions to choose new subsets, calculate utilities
 
 from user import User
+import numpy as np
 import random
 users = []
 
@@ -31,7 +32,6 @@ def run_round(i, isRandom):
             candidates[x] = user.id
             user.seen.add(x)
             users[x].seen.add(user.id)
-    print(candidates)
     for user_id, cand_id in candidates.items():
         user = users[user_id]
         cand = users[cand_id]
@@ -39,14 +39,27 @@ def run_round(i, isRandom):
         user.history.append((i, cand_id, user.r_hat, user.p_hat))
         # print(users[user_id])
 
-init_users(50)
-for i in range(25):
-    print("********ROUND {}****************".format(i))
+def rmse(predictions, targets):
+    return np.sqrt(((predictions - targets) ** 2).mean())
+
+init_users(500)
+for i in range(200):
     while True:
         try:
             run_round(i, (True))
             break
         except:
             pass
+
+real_r, pred_r, real_p, pred_p = [], [], [], []
 for user in users:
-    print(user, "\n", user.history)
+    real_r.append(user.r)
+    real_p.append(user.p)
+    pred_r.append(user.r_hat)
+    pred_p.append(user.p_hat)
+    print "User: " + str(user.id)
+    print "Actual: " + str(user.r) + ", " + str(user.p)
+    print "Predicted: " + str(user.r_hat) + ", " + str(user.p_hat)
+print "Discount: " + str(users[0].discount)
+print rmse(np.array(real_r), np.array(pred_r))
+print rmse(np.array(real_p), np.array(pred_p))
