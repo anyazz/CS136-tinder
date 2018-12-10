@@ -15,6 +15,7 @@ def init_users(n):
         users.append(User(i))
 
 def run_round(i, isRandom):
+    flag = False
     sorted_users = users
     candidates = {}
     if not isRandom:
@@ -38,13 +39,14 @@ def run_round(i, isRandom):
         user.history.append((i, cand_id, user.r_hat, user.p_hat))
         # print(users[user_id])
 
-
-init_users(100)
-for i in range(100):
+init_users(50)
+for i in range(25):
     print("********ROUND {}****************".format(i))
-    try:
-        run_round(i, True)
-    except:
-        for user in users:
-            print(user, "\n", user.history)
-        break
+    while True:
+        try:
+            run_round(i, (True))
+            break
+        except:
+            pass
+for user in users:
+    print(user, "\n", user.history)
