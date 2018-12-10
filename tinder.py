@@ -11,23 +11,15 @@ import random
 users = []
 discount = 1.0
 
-def run_round(i):
-    candidates = {}
-    user_ids = set(i for i in range(len(users)))
-    for user in users:
-        sample = user_ids - set([user.id]) - set(user.seen)
-        x = random.choice(tuple(sample))
-        candidates[user.id] = x
-        user.seen.add(x)
-
-    for user_id, cand_id in candidates.items():
-        user = users[user_id]
-        cand = users[cand_id]
-        diff = user.swipe(cand, discount, isTraining=True)
-        user.history.append((i, cand_id, round(user.r_hat,2), round(user.p_hat,2), diff))
-
-def rmse(predictions, targets):
-    return np.sqrt(((predictions - targets) ** 2).mean())
+def main():
+    sum_rmse_r, sum_rmse_p = 0.0,0.0
+    for i in range(10):
+        print("****TEST {}****".format(i))
+        tinder(300, 250)
+        rmse_r, rmse_p = get_rmse()
+        sum_rmse_r += rmse_r
+        sum_rmse_p += rmse_p
+    print(sum_rmse_r/10, sum_rmse_p/10)
 
 def tinder(n, rounds):
     global users, discount
@@ -43,13 +35,29 @@ def tinder(n, rounds):
     for i in range(rounds):
         run_round(i)
 
+def run_round(i):
+    candidates = {}
+    user_ids = set(i for i in range(len(users)))
+    for user in users:
+        sample = user_ids - set([user.id]) - set(user.seen)
+        x = random.choice(tuple(sample))
+        candidates[user.id] = x
+        user.seen.add(x)
+
+    for user_id, cand_id in candidates.items():
+        user = users[user_id]
+        cand = users[cand_id]
+        diff = user.swipe(cand, discount, isTraining=True)
+        user.history.append((i, cand_id, round(user.r_hat,2), round(user.p_hat,2), diff))
+
+def get_rmse(): 
     # calculate RMSE
     real_r, pred_r, real_p, pred_p = [], [], [], []
     for user in users:
         real_r.append(user.r)
         real_p.append(user.p)
-        pred_r.append(round(user.r_hat, 1))
-        pred_p.append(round(user.p_hat, 1))
+        pred_r.append(user.r_hat)
+        pred_p.append(user.p_hat)
         print(user)
         # print("History: " + str(user.history))
         # print("Delta: " + str(user.delta))
@@ -64,12 +72,9 @@ def tinder(n, rounds):
     #     utility += user.utility
     # print("TOTAL U", utility)
 
-sum_rmse_r, sum_rmse_p = 0.0,0.0
-for i in range(10):
-    print("****TEST {}****".format(i))
-    rmse_r, rmse_p = tinder(300, 200)
-    sum_rmse_r += rmse_r
-    sum_rmse_p += rmse_p
-print(sum_rmse_r/10, sum_rmse_p/10)
+def rmse(predictions, targets):
+    return np.sqrt(((predictions - targets) ** 2).mean())
+
+main()
 
 
