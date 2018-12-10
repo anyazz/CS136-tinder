@@ -40,7 +40,7 @@ def tinder(n, rounds):
     for user in users:
         candidates = [x for x in users if x.r >= user.p and user.r >= x.p]
         for candidate in candidates:
-            user.swipe(candidate, 1.0, isTraining=false)
+            user.swipe(candidate, 1.0, isTraining=False)
         utility += user.utility
     print("TOTAL U", utility)
 
@@ -56,8 +56,8 @@ def run_round(i):
     for user_id, cand_id in candidates.items():
         user = users[user_id]
         cand = users[cand_id]
-        diff = user.swipe(cand, discount, isTraining=True)
-        user.history.append((i, cand_id, round(user.r_hat,2), round(user.p_hat,2), diff))
+        user.swipe(cand, discount, isTraining=True)
+        user.history.append((i, cand_id, round(user.r_hat,2), round(user.p_hat,2)))
 
 def get_rmse(): 
     # calculate RMSE

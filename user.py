@@ -35,8 +35,8 @@ class User:
             diff = self.train(other, discount)
         else:
             self.get_utility(other)
-        return diff
-
+        return 
+        
     def train(self, other, discount):
         diff = abs(self.p_hat - other.r_hat) 
         self_diff = max(diff, 1) * self.delta
