@@ -1,71 +1,78 @@
-# other class
-
-# ATTRIBUTES
-# user id
-# true values for rating and pickiness, all i.i.d Unif(0, 5)
-# predicted values for rating and pickiness, init to 2.5
 import random
 
+# USER CLASS
 class User:
 
     def __init__(self, id):
+        # unique integer ID of user
         self.id = id
+        # true rating: implicit "attractiveness" rating perceived by other users
         self.r = round(random.uniform(0.0, 5.0), 1)
-        self.p = round(random.uniform(max(self.r-1.5, 0), min(self.r+1.5, 5.0)), 1)
-        self.reported_p = round(random.uniform(0.0, 5.0), 1)
+        # true pickiness: implicit rating threshold for right swipe
+        self.p = round(random.uniform(max(self.r - 1.5, 0), min(self.r + 1.5, 5.0)), 1)
+        # predicted rating
         self.r_hat = 2.5
+        # predicted pickiness
         self.p_hat = 2.5
+        # set of users seen while training
         self.seen = set()
+        # number of right swipes
         self.swipes = 0
+        # set of matches
         self.matches = set()
+        # discount factor
         self.delta = 1.0
+        # records evolution of predictions over time
         self.history = []
+        # user utility
         self.utility = 0
-        self.discount = 1.0
 
     def __str__(self):
-        string = "User {}: \n    true: {}, {}\n    pred: {}, {}\n    report: {} \n    matches: {}\n    utility: {}"
-        return string.format(self.id, self.r, self.p, self.r_hat, self.p_hat, self.reported_p, len(self.matches), round(self.utility, 2))
+        string = "User {}: \n    true: {}, {}\n    pred: {}, {}\n    matches: {}\n    utility: {}"
+        return string.format(self.id, self.r, self.p, self.r_hat, 
+            self.p_hat, len(self.matches), round(self.utility, 2))
 
-# METHODS
-# swipe - takes other User object, returns 1 for swipe right and 0 for swipe left
-#         (possibly nondeterministic --> p of not defecting = abs(rating - threshold)/5)
-# get_utility - calculates utility to other
-# update_predictions - based on outcome of swipe, update r_hat and p_hat
-    def swipe(self, other, discount, isTraining):
-        if isTraining:
-            diff = self.train(other, discount)
-        else:
-            self.get_utility(other)
-        return 
 
-    def train(self, other, discount):
+    # swipe function for training
+    def swipe_train(self, other, discount):
+        # calculate magnitude of difference between rating and pickiness
         diff = abs(self.p_hat - other.r_hat) 
+
+        # multiply by appropriate delta factor for user
         self_diff = max(diff, 1) * self.delta
         other_diff = max(diff, 1) * other.delta
 
-        if self.reported_p <= other.r and self.p_hat > other.r_hat:
+        # if behavior does not match expected, update predictions by diff, 
+        # ensuring that new values don't go outside [0,5] range
+        if self.p <= other.r and self.p_hat > other.r_hat:
+            # true swipe right, expected swipe left --> decrease pickiness
+            # and increase rating
             self.p_hat = round(max(self.p_hat - self_diff, 0.0), 2)
             other.r_hat = round(min(other.r_hat + other_diff, 5.0), 2)
-        elif self.reported_p > other.r and self.p_hat <= other.r_hat:
+
+        elif self.p > other.r and self.p_hat <= other.r_hat:
+            # true swipe left, expected swipe right --> increase pickiness
+            # and decrease rating
             self.p_hat = round(min(self.p_hat + self_diff, 5.0), 2)
             other.r_hat = round(max(other.r_hat - other_diff, 0.0), 2)
+       
+        # update delta factors by discount
         self.delta = self.delta * discount
         other.delta = other.delta * discount
-        return self_diff
 
-    def get_utility(self, other):
-        if self.reported_p <= other.r:
-            # swipe right
+    # swipe function for simulation
+    def swipe_actual(self, other):
+        if self.p <= other.r:
+            # observe swipe right
             self.swipes += 1
             if other.p <= self.r:
                 # match
                 self.matches.add(other)
-                self.utility += max(0, other.r - self.p) + 1
+                self.utility += other.r - self.p + 2
             else:
-                self.utility += min(0, other.r - self.p) - 1
+                self.utility += min(0, other.r - self.p - 2)
         else:
-            # swipe left
+            # observe swipe left
             if other.p <= self.r:
                 self.utility += 0.5
             else:
