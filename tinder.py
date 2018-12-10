@@ -20,7 +20,6 @@ def run_round(i):
         candidates[user.id] = x
         user.seen.add(x)
 
-    # print(candidates)
     for user_id, cand_id in candidates.items():
         user = users[user_id]
         cand = users[cand_id]
@@ -49,8 +48,8 @@ def tinder(n, rounds):
     for user in users:
         real_r.append(user.r)
         real_p.append(user.p)
-        pred_r.append(user.r_hat)
-        pred_p.append(user.p_hat)
+        pred_r.append(round(user.r_hat, 1))
+        pred_p.append(round(user.p_hat, 1))
         print(user)
         # print("History: " + str(user.history))
         # print("Delta: " + str(user.delta))
