@@ -24,9 +24,12 @@ def run_round(isRandom):
 			user_ids = set(i for i in range(len(users)))
 			if not isRandom:
 				pass
-			x = random.sample(user_ids - user.seen - set([user.id]), 1)[0]
-			candidates[user.id] = users[x].id
-			candidates[users[x].id] = user.id
+			sample = user_ids - user.seen - set([user.id]) - set(candidates.keys())
+			x = random.sample(sample, 1)[0]
+			candidates[user.id] = x
+			candidates[x] = user.id
+			user.seen.add(x)
+			users[x].seen.add(user.id)
 	print candidates
 
 init_users(6)
