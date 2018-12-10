@@ -5,6 +5,7 @@
 # true values for rating and pickiness, all i.i.d Unif(0, 5)
 # predicted values for rating and pickiness, init to 2.5
 import random
+discount = 0.99
 
 class User:
 
@@ -16,7 +17,7 @@ class User:
         self.p_hat = 2.5
         self.seen = set()
         self.matches = set()
-        self.discount = 0.7
+        self.delta = 1.0
         self.history = []
 
     def __str__(self):
@@ -29,8 +30,8 @@ class User:
 # get_utility - calculates utility to user
 # update_predictions - based on outcome of swipe, update r_hat and p_hat
     def swipe(self, user):
-        diff = abs(self.p_hat - user.r_hat) * self.discount
-        diff = max(diff, self.discount)
+        diff = abs(self.p_hat - user.r_hat) 
+        diff = max(diff, 1) * self.delta
         if self.p <= user.r:
             # print("User {} swiped right on user {}".format(self.id, user.id))
             if self.p_hat > user.r_hat:
@@ -41,4 +42,5 @@ class User:
             if self.p_hat <= user.r_hat:
                 self.p_hat = round(min(self.p_hat + diff, 5.0), 1)
                 user.r_hat = round(max(user.r_hat - diff, 0.0), 1)
+        self.delta = self.delta * discount
         return
