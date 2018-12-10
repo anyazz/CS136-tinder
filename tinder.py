@@ -35,6 +35,15 @@ def tinder(n, rounds):
     for i in range(rounds):
         run_round(i)
 
+    # simulate actual Tinder, calculating total utility
+    utility = 0
+    for user in users:
+        candidates = [x for x in users if x.r >= user.p and user.r >= x.p]
+        for candidate in candidates:
+            user.swipe(candidate, 1.0, isTraining=false)
+        utility += user.utility
+    print("TOTAL U", utility)
+
 def run_round(i):
     candidates = {}
     user_ids = set(i for i in range(len(users)))
@@ -62,15 +71,6 @@ def get_rmse():
         # print("History: " + str(user.history))
         # print("Delta: " + str(user.delta))
     return (rmse(np.array(real_r), np.array(pred_r)), rmse(np.array(real_p), np.array(pred_p)))
-
-    # simulate actual Tinder, calculating total utility
-    # utility = 0
-    # for user in users:
-    #     candidates = [x for x in users if x.r >= user.p and user.r >= x.p]
-    #     for candidate in candidates:
-    #         user.swipe(candidate, isTraining=false)
-    #     utility += user.utility
-    # print("TOTAL U", utility)
 
 def rmse(predictions, targets):
     return np.sqrt(((predictions - targets) ** 2).mean())
