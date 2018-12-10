@@ -21,11 +21,16 @@ class User:
 # 		  (possibly nondeterministic --> p of not defecting = abs(rating - threshold)/5)
 # get_utility - calculates utility to user
 # update_predictions - based on outcome of swipe, update r_hat and p_hat
-    def swipe(self, direction, user):
-        if direction:
-            self.pickiness -= user.rating * discount
+    def swipe(self, user):
+		diff = (self.p_hat - user.r_hat) * discount
+        if self.p <= user.r:
+        	if self.p_hat > user.r_hat:
+            	self.p_hat -= diff
+            	user.r_hat += diff
         else:
-            self.pickiness += user.rating * discount
+            if self.p_hat <= user.r_hat:
+            	self.p_hat += diff
+            	user.r_hat -= diff
         return
 
     def swiped(self, direction, user):
