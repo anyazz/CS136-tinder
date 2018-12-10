@@ -6,7 +6,7 @@ import random
 users = []
 discount = 1.0
 utility = 0
-swipe_limit = 30
+swipe_limit = 50
 trials = 10
 
 # main logic, runs multiple trials and aggregates statistics

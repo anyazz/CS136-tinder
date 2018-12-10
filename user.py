@@ -68,9 +68,9 @@ class User:
             if other.p <= self.r:
                 # match
                 self.matches.add(other)
-                self.utility += other.r - self.p + 2
+                self.utility += other.r - self.p + 1
             else:
-                self.utility += min(0, other.r - self.p - 2)
+                self.utility += min(0, other.r - self.p - 1)
         else:
             # observe swipe left
             if other.p <= self.r:
