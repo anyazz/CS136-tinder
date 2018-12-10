@@ -10,19 +10,25 @@ import numpy as np
 import random
 users = []
 discount = 1.0
+utility = 0
+swipe_limit = 30
 
 def main():
-    sum_rmse_r, sum_rmse_p = 0.0,0.0
+    sum_rmse_r, sum_rmse_p, sum_utility = 0.0, 0.0, 0.0
     for i in range(10):
         print("****TEST {}****".format(i))
         tinder(300, 250)
         rmse_r, rmse_p = get_rmse()
         sum_rmse_r += rmse_r
         sum_rmse_p += rmse_p
-    print(sum_rmse_r/10, sum_rmse_p/10)
+        sum_utility += utility
+        users.sort(key=lambda x: x.utility)
+        for user in users:
+            print(user)
+    print(sum_rmse_r/10, sum_rmse_p/10, sum_utility/10)
 
 def tinder(n, rounds):
-    global users, discount
+    global users, discount, utility
     discount = .1 ** (1/(2*rounds))
 
     # initialize users
@@ -38,11 +44,13 @@ def tinder(n, rounds):
     # simulate actual Tinder, calculating total utility
     utility = 0
     for user in users:
-        candidates = [x for x in users if x.r >= user.p and user.r >= x.p]
+        candidates = [x for x in users if x.r_hat >= user.p_hat and user.r_hat >= x.p_hat]
         for candidate in candidates:
+            if user.swipes >= swipe_limit:
+                break
             user.swipe(candidate, 1.0, isTraining=False)
         utility += user.utility
-    print("TOTAL U", utility)
+        # print(user)
 
 def run_round(i):
     candidates = {}
